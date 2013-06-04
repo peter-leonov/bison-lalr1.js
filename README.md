@@ -6,6 +6,8 @@ Warning, beta version! :)
 
 Allows to easily port grammars from other languages to JavaScript. As it is just a Bison with a different target platform, lalr1.js supports all the features of BNF syntax and extensions. Also, Bison generates eficient tables which do fit v8 and js17 very tight. So expect good performance!
 
+Please look at the produced code in [calculator.js](calculator.js)
+
 P. S.
 If someone could port flex to JavaScript, there will be a full professional stack for creating parsers in pure JavaScript.
 
