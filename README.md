@@ -27,6 +27,7 @@ v8 calculator.js
 results in:
 
 ```
+...
 Now at end of input.
 Shifting token $end (0-1: )
 Entering state 10
