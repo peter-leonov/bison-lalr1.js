@@ -16,12 +16,26 @@ Usage
 Just like any other custom skeleton:
 
 ```bash
-bison -S ./lalr.js calculator.y
+bison -S ./lalr1.js calculator.y
 ```
 
 then:
 ```bash
 v8 calculator.js
+```
+
+results in:
+
+```
+Now at end of input.
+Shifting token $end (0-1: )
+Entering state 10
+Stack now
+ 10
+ 6
+ 0
+true
+true
 ```
 
 The `calcolator.y` example has a built-in lexer emulator with a simple tokens stream for the `((3+2*3)*1)/-3` expression. Yes, I'd better add a full lexer at some point ;)
