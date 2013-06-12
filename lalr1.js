@@ -28,7 +28,7 @@ m4_define([b4_null], [null])
 
 # b4_token_enum(TOKEN-NAME, TOKEN-NUMBER)
 # Output the definition of this token as an enum.
-m4_define([b4_token_enum], [  '$1': $2])
+m4_define([b4_token_enum], [  $1 = $2])
 
 
 # b4_token_enums(LIST-OF-PAIRS-TOKEN-NAME-TOKEN-NUMBER)
@@ -75,7 +75,7 @@ b4_copyright([Skeleton implementation for Bison LALR(1) parsers in JavaScript], 
 ;(function(){ // start of the parser namespase
 /* First part of user declarations.  */
 ]b4_pre_prologue[
-]b4_percent_code_get([[imports]])[
+
 /**
  * A Bison parser, automatically generated from <tt>]m4_bpatsubst(b4_file_name, [^"\(.*\)"$], [\1])[</tt>.
  *
@@ -97,7 +97,7 @@ function Location (begin, end) {
 
 Location.prototype.toString = function () {
   if (this.begin === this.end)
-    return "" + begin;
+    return "" + this.begin;
 
   return this.begin + "-" + this.end;
 }
@@ -517,7 +517,7 @@ function YYParser (yylexer)
         // Muck with the stack to setup for yylloc.
         yystack.push(0, null, yylloc);
         yystack.push(0, null, yyerrloc);
-        yyloc = yylloc(yystack, 2);
+        yyloc = yystack.locationFromNthItemToCurrent(2);
         yystack.pop(2);
 
         // Shift the error token.
@@ -826,13 +826,13 @@ YYParser.prototype =
         {
           if
           (
-            yycheck_[x + yyn] == x
-            && x != yyterror_
+            this.yycheck_[x + yyn] == x
+            && x != this.yyterror_
             && this.yytable_[x + yyn] != this.yytable_ninf_ // yytable_[x + yyn] isn't an error
           )
           {
             res += (count++ == 0 ? ", expecting " : " or ");
-            res += yytnamerr_(yytname_[x]);
+            res += yytnamerr_(this.yytname_[x]);
           }
         }
       }
@@ -881,18 +881,18 @@ YYParser.prototype =
 
   debug_stack_print: function debug_stack_print ()
   {
-    console.log("Stack now");
+    print("Stack now");
 
     var yystack = this.yystack
     for (var i = 0, ih = yystack.height(); i <= ih; i++)
     {
-      console.log(' ' + yystack.stateAt(i));
+      print(' ' + yystack.stateAt(i));
     }
   },
 
   debug_puts: function debug_puts (message)
   {
-    console.log(message);
+    print(message);
   }
 }
 
@@ -902,15 +902,16 @@ YYParser.bisonVersion = "]b4_version[";
 // Name of the skeleton that generated this parser.
 YYParser.bisonSkeleton = ]b4_skeleton[;
 
+;(function(){ // epilogue namespace
+
 // Tokens.
 // Token numbers, to be returned by the scanner.
-YYParser.TOKENS =
-{
-  EOF: 0,
-]b4_token_enums(b4_tokens)[
-};
+var
+]b4_token_enums(b4_tokens)[;
 
 ]b4_epilogue[
+
+})(); // end of epilogue namespace
 
 }).call(this); // end of the parser namespase
 ]
