@@ -1,4 +1,11 @@
 %{
+
+if (typeof write == "undefined")
+{
+  write = print;
+}
+puts = print;
+
 var result
 %}
 
@@ -6,19 +13,19 @@ var result
 
 /* operator associations and precedence */
 
-%token E END NUMBER PI L R
+%token tE tEND tNUMBER tPI tL tR
 
 %left '+' '-'
 %left '*' '/'
 %left '^'
-%left UMINUS
+%left tUMINUS
 
 %start expressions
 
 %% /* language grammar */
 
 expressions
-    : e END
+    : e tEND
         {result = $1;}
     ;
 
@@ -33,15 +40,15 @@ e
         {$$ = $1 / $3;}
     | e '^' e
         {$$ = Math.pow($1, $3);}
-    | '-' e %prec UMINUS
+    | '-' e %prec tUMINUS
         {$$ = -$2;}
     | '(' e ')'
         {$$ = $2;}
-    | NUMBER
+    | tNUMBER
         {$$ = Number(yyval);}
-    | E
+    | tE
         {$$ = Math.E;}
-    | PI
+    | tPI
         {$$ = Math.PI;}
     ;
 
@@ -61,7 +68,7 @@ Lexer.prototype =
   yylex: function ()
   {
     if (this.tokens.length == 0)
-      return T.EOF
+      return 0
     
     this.token = this.tokens.shift()
     // print('yylex', this.token)
@@ -95,32 +102,33 @@ return Lexer
 
 this.console = {log: print}
 
-T.PLUS = 43 // '+'.charCodeAt(0)
-T.MINUS = 45 // '-'.charCodeAt(0)
-T.MULT = 42 // '*'.charCodeAt(0)
-T.DIV = 47 // '/'.charCodeAt(0)
-T.POW = 94 // '^'.charCodeAt(0)
-T.L = 40 // '('.charCodeAt(0)
-T.R = 41 // ')'.charCodeAt(0)
+var
+  tPLUS = 43, // '+'.charCodeAt(0)
+  tMINUS = 45, // '-'.charCodeAt(0)
+  tMULT = 42, // '*'.charCodeAt(0)
+  tDIV = 47, // '/'.charCodeAt(0)
+  tPOW = 94, // '^'.charCodeAt(0)
+  tL = 40, // '('.charCodeAt(0)
+  tR = 41; // ')'.charCodeAt(0)
 
 // ((3+2*3)*1)/-3
 var lexer = new Lexer
 ([
-  [T.L, '('],
-  [T.L, '('],
-  [T.NUMBER, '3'],
-  [T.PLUS, '+'],
-  [T.NUMBER, '2'],
-  [T.MULT, '*'],
-  [T.NUMBER, '3'],
-  [T.R, ')'],
-  [T.MULT, '*'],
-  [T.NUMBER, '1'],
-  [T.R, ')'],
-  [T.DIV, '/'],
-  [T.MINUS, '-'],
-  [T.NUMBER, '3'],
-  [T.END, '']
+  [tL, '('],
+  [tL, '('],
+  [tNUMBER, '3'],
+  [tPLUS, '+'],
+  [tNUMBER, '2'],
+  [tMULT, '*'],
+  [tNUMBER, '3'],
+  [tR, ')'],
+  [tMULT, '*'],
+  [tNUMBER, '1'],
+  [tR, ')'],
+  [tDIV, '/'],
+  [tMINUS, '-'],
+  [tNUMBER, '3'],
+  [tEND, '']
 ])
 
 var parser = new YYParser(lexer)
