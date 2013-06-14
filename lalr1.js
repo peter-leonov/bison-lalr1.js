@@ -55,11 +55,13 @@ m4_define([b4_lhs_value], [yyval])
 
 # b4_rhs_value(RULE-LENGTH, NUM)
 # $N
-m4_define([b4_rhs_value], [(yystack.valueAt($1-($2)))])
+# TODO: optimize access to the N-th stack element
+# m4_define([b4_rhs_value], [(yystack.valueAt($1-($2)))])
+m4_define([b4_rhs_value], [[yystack.valueStack[yystack.valueStack.length-1-(($1-($2)))]]])
 
 
 # b4_rhs_location(RULE-LENGTH, NUM)
-# Expansion of @NUM, where the current rule has RULE-LENGTH symbols on RHS.
+# Expansion of NUM, where the current rule has RULE-LENGTH symbols on RHS.
 m4_define([b4_rhs_location], [yystack.locationAt($1-($2))])
 
 
@@ -72,8 +74,15 @@ b4_copyright([Skeleton implementation for Bison LALR(1) parsers in JavaScript], 
 
 
 [
-;(function(){ // start of the parser namespase
+;(function(){ // start of the whole parser+lexer namespase
 /* First part of user declarations.  */
+
+// Tokens.
+// Token numbers, to be returned by the scanner.
+var
+]b4_token_enums(b4_tokens)[;
+
+
 ]b4_pre_prologue[
 
 /**
@@ -83,6 +92,7 @@ b4_copyright([Skeleton implementation for Bison LALR(1) parsers in JavaScript], 
  * @@author Java skeleton ported by Peter Leonov.
  */
 
+var YYParser = (function(){ // start of the Parser very own namespase
 
 /**
 * A class defining a pair of positions.  Positions, defined by the
@@ -105,9 +115,9 @@ Location.prototype.toString = function () {
 
 function YYStack ()
 {
-  var stateStack = [];
-  var locStack = [];
-  var valueStack = [];
+  var stateStack = this.stateStack = [];
+  var locStack = this.locStack = [];
+  var valueStack = this.valueStack = [];
 
   this.push = function push (state, value, location)
   {
@@ -160,6 +170,9 @@ function YYStack ()
 // Instantiates the Bison-generated parser.
 function YYParser (yylexer)
 {
+  // self
+  var yyparser = this;
+  
   // The scanner that will supply tokens to the parser.
   this.yylexer = yylexer;
 
@@ -196,6 +209,7 @@ function YYParser (yylexer)
   var yyntokens_ = this.yyntokens_ = ]b4_tokens_number[;
   
   var yyerrstatus_ = 0;
+  function yyerrok () {yyerrstatus_ = 0;}
   
   // Return whether error recovery is being done.
   // In this state, the parser reads token until it reaches a known state,
@@ -237,6 +251,7 @@ function YYParser (yylexer)
 
     yystack.pop(yylen);
     yylen = 0;
+    debug_stack_print(yystack);
 
     // Shift the result of the reduction.
     yyn = yyr1_[yyn];
@@ -247,6 +262,7 @@ function YYParser (yylexer)
       yystate = yydefgoto_[yyn - yyntokens_];
 
     yystack.push(yystate, yyval, yyloc);
+    // was: usless: return YYNEWSTATE;
   }
 
   /**
@@ -284,7 +300,7 @@ function YYParser (yylexer)
     // Semantic value of the lookahead.
     var yylval = null;
 
-    debug_puts("Starting parse");
+    debug_print("Starting parse\n");
     yyerrstatus_ = 0;
 
 
@@ -301,8 +317,7 @@ function YYParser (yylexer)
       case YYNEWSTATE:
         // Unlike in the C/C++ skeletons, the state is already pushed when we come here.
 
-        debug_puts("Entering state " + yystate);
-        debug_stack_print(yystack)
+        debug_print("Entering state " + yystate + "\n");
 
         // Accept?
         if (yystate == yyfinal_)
@@ -321,7 +336,7 @@ function YYParser (yylexer)
         // Read a lookahead token.
         if (yychar == yyempty_)
         {
-          debug_puts("Reading a token: ");
+          debug_print("Reading a token: ");
           yychar = yylexer.yylex();
 
           yylloc = new Location(yylexer.getStartPos(), yylexer.getEndPos());
@@ -333,7 +348,7 @@ function YYParser (yylexer)
         if (yychar <= EOF)
         {
           yychar = yytoken = EOF;
-          debug_puts("Now at end of input.");
+          debug_print("Now at end of input.\n");
         }
         else
         {
@@ -439,7 +454,8 @@ function YYParser (yylexer)
           ++yynerrs_;
           if (yychar == yyempty_)
             yytoken = yyempty_;
-          this.yyerror(yylloc, this.yysyntax_error(yystate, yytoken));
+          // this.yyerror(yylloc, this.yysyntax_error(yystate, yytoken));
+          yyerror(this.yysyntax_error(yystate, yytoken));
         }
 
         yyerrloc = yylloc;
@@ -475,6 +491,7 @@ function YYParser (yylexer)
         // which action triggered this YYERROR.
         yystack.pop(yylen);
         yylen = 0;
+        debug_stack_print(yystack);
         yystate = yystack.stateAt(0);
         // goto
         label = YYERRLAB1;
@@ -503,14 +520,13 @@ function YYParser (yylexer)
           // Pop the current state because it cannot handle the error token.
           if (yystack.height() == 0)
           {
-            debug_puts('Empty stack while handling error');
             return false;
           }
 
           yyerrloc = yystack.locationAt(0);
           yystack.pop(1);
           yystate = yystack.stateAt(0);
-          debug_stack_print(yystack)
+          debug_stack_print(yystack);
         }
 
 
@@ -555,14 +571,14 @@ function YYParser (yylexer)
   function debug_reduce_print (yyn) {}
   function debug_symbol_print (message, yytype, yyvaluep, yylocationp) {}
   function debug_stack_print (yystack) {}
-  function debug_puts (message) {}
+  function debug_print (message) {}
 
   this.enableDebug = function enableDebug ()
   {
     debug_reduce_print = this.debug_reduce_print.bind(this)
     debug_symbol_print = this.debug_symbol_print.bind(this)
     debug_stack_print  = this.debug_stack_print.bind(this)
-    debug_puts         = this.debug_puts.bind(this)
+    debug_print        = this.debug_print.bind(this)
   }
 
 
@@ -681,6 +697,7 @@ function YYParser (yylexer)
   ];
 
   // YYRLINE[YYN] -- Source line where rule number YYN was defined.
+  // TODO: hide this table under #if DEBUG
   var yyrline_ = this.yyrline_ =
   [
     //]]
@@ -710,10 +727,10 @@ function YYParser (yylexer)
 // rare used functions
 YYParser.prototype =
 {
-  yyerror: function yyerror (location, message)
-  {
-    this.yylexer.yyerror(location, message);
-  },
+  // yyerror: function yyerror (location, message)
+  // {
+  //   this.yylexer.yyerror(location, message);
+  // },
   
   // Report on the debug stream that the rule yyrule is going to be reduced.
   debug_reduce_print: function debug_reduce_print (yyrule)
@@ -722,7 +739,7 @@ YYParser.prototype =
     var yylno = this.yyrline_[yyrule];
     var yynrhs = this.yyr2_[yyrule];
     // Print the symbols being reduced, and their result.
-    this.debug_puts("Reducing stack by rule " + (yyrule - 1) + " (line " + yylno + "), ");
+    this.debug_print("Reducing stack by rule " + (yyrule - 1) + " (line " + yylno + "), \n");
 
     // The symbols being reduced.
     for (var yyi = 0; yyi < yynrhs; yyi++)
@@ -738,7 +755,7 @@ YYParser.prototype =
 
   debug_symbol_print: function debug_symbol_print (message, yytype, yyvaluep, yylocationp)
   {
-    this.debug_puts
+    this.debug_print
     (
       message
       + (yytype < this.yyntokens_ ? " token " : " nterm ")
@@ -746,7 +763,7 @@ YYParser.prototype =
       + " ("
       + yylocationp + ": "
       + (yyvaluep == null ? "(null)" : yyvaluep)
-      + ")"
+      + ")\n"
     );
   },
 
@@ -881,18 +898,19 @@ YYParser.prototype =
 
   debug_stack_print: function debug_stack_print ()
   {
-    print("Stack now");
-
-    var yystack = this.yystack
+    var yystack = this.yystack,
+      ary = [];
     for (var i = 0, ih = yystack.height(); i <= ih; i++)
     {
-      print(' ' + yystack.stateAt(i));
+      ary.push(yystack.stateAt(i));
     }
+    
+    puts("Stack now " + ary.reverse().join(' '));
   },
 
-  debug_puts: function debug_puts (message)
+  debug_print: function debug_print (message)
   {
-    print(message);
+    write(message);
   }
 }
 
@@ -902,17 +920,16 @@ YYParser.bisonVersion = "]b4_version[";
 // Name of the skeleton that generated this parser.
 YYParser.bisonSkeleton = ]b4_skeleton[;
 
-;(function(){ // epilogue namespace
+return YYParser;
 
-// Tokens.
-// Token numbers, to be returned by the scanner.
-var
-]b4_token_enums(b4_tokens)[;
+})(); // end of the Parser very own namespase
+
+;(function(){ // epilogue namespace
 
 ]b4_epilogue[
 
 })(); // end of epilogue namespace
 
-}).call(this); // end of the parser namespase
+}).call(this); // start of the whole parser+lexer namespase
 ]
 b4_output_end()
