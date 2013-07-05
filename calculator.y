@@ -9,8 +9,6 @@ puts = print;
 var result
 %}
 
-%output "calculator.js"
-
 /* operator associations and precedence */
 
 %token tE tEND tNUMBER tPI tL tR
@@ -68,26 +66,13 @@ Lexer.prototype =
   yylex: function ()
   {
     if (this.tokens.length == 0)
-      return 0
+      return 0;
     
-    this.token = this.tokens.shift()
-    // print('yylex', this.token)
-    return this.token[0]
-  },
-
-  getLVal: function ()
-  {
-    return this.token[1]
-  },
-
-  getStartPos: function ()
-  {
-    return 0
-  },
-
-  getEndPos: function ()
-  {
-    return 1
+    var token = this.tokens.shift();
+    // the value of the token
+    this.yylval = token[1];
+    
+    return token[0];
   },
 
   yyerror: function (location, message)
@@ -132,6 +117,5 @@ var lexer = new Lexer
 ])
 
 var parser = new YYParser(lexer)
-parser.enableDebug()
 print(parser.parse())
 print(result == -3)
