@@ -58,7 +58,7 @@ Test
 
 then:
 
-    v8 calculator.js
+    d8 calculator.js
 
 outputs:
 
@@ -67,6 +67,32 @@ outputs:
 
 which is good :)
 
+If your sustem doesn't build `d8` you may replace it with just `v8`, but it gives sligtly different output.
+
+If you want to trace all the state transitions run `make calculator-debug` in the first step. Then run `d8 calculator.js` to see something like this:
+
+    Starting parse
+    Entering state 0
+    Reading a token: Next token is token '(' ("(")
+    Shifting token '(' ("(")
+    Entering state 5
+    
+    …
+    
+    Entering state 11
+    Reducing stack by rule 1 (line 26):
+       $1 = nterm e (-3)
+       $2 = token tEND ("")
+    -> $$ = nterm expressions (-3)
+    Stack now 0
+    Entering state 6
+    Reading a token: Now at end of input.
+    Shifting token $end ("")
+    Entering state 10
+    true
+    true
+
+which is good too :)
 
 The `calcolator.y` example has a built-in lexer emulator with a simple token stream for the `((3+2*3)*1)/-3` expression. In [ruby-parser.js](https://github.com/kung-fu-tzu/ruby-parser.js) project you can find a full featured parser build with `lalr1.js`.
 

@@ -117,5 +117,6 @@ var lexer = new Lexer
 ])
 
 var parser = new YYParser(lexer)
+parser.yydebug = 2;
 print(parser.parse())
 print(result == -3)
