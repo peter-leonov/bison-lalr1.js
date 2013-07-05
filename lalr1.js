@@ -40,8 +40,9 @@ m4_define([b4_token_enums],
 
 
 # b4-case(ID, CODE)
-m4_define([b4_case], [  '$1': function ()
-    $2,
+m4_define([b4_case], [  $1: function ()$2,
+
+
 ])
 
 
@@ -57,12 +58,8 @@ m4_define([b4_lhs_value], [yyval])
 # $N
 # TODO: optimize access to the N-th stack element
 # m4_define([b4_rhs_value], [(yystack.valueAt($1-($2)))])
-m4_define([b4_rhs_value], [[yystack.valueStack[yystack.valueStack.length-1-(($1-($2)))]]])
-
-
-# b4_rhs_location(RULE-LENGTH, NUM)
-# Expansion of NUM, where the current rule has RULE-LENGTH symbols on RHS.
-m4_define([b4_rhs_location], [yystack.locationAt($1-($2))])
+m4_define([b4_rhs_value], [[yyvs[yyvs.length-1-(($1-($2)))]]])
+m4_define([b4_rhs_value_debug], [[yystack.valueStack[yystack.valueStack.length-1-(($1-($2)))]]])
 
 
 b4_defines_if([b4_fatal([%s: %%defines does not make sense in JavaScript], [b4_skeleton])])
@@ -72,10 +69,8 @@ m4_ifval(m4_defn([b4_symbol_destructors]), [b4_fatal([%s: %%destructor does not 
 b4_output_begin([b4_parser_file_name])
 b4_copyright([Skeleton implementation for Bison LALR(1) parsers in JavaScript], [2007-2013])
 
-
-[
-;(function(){ // start of the whole parser+lexer namespase
 /* First part of user declarations.  */
+[]b4_pre_prologue[
 
 // Tokens.
 // Token numbers, to be returned by the scanner.
@@ -83,107 +78,58 @@ var
 ]b4_token_enums(b4_tokens)[;
 
 
-]b4_pre_prologue[
+// here goes all the lexer code that depends on token numbers
+]b4_percent_code_get([[lexer]])[
+
 
 /**
  * A Bison parser, automatically generated from <tt>]m4_bpatsubst(b4_file_name, [^"\(.*\)"$], [\1])[</tt>.
  *
  * @@author LALR (1) parser skeleton written by Paolo Bonzini.
- * @@author Java skeleton ported by Peter Leonov.
+ * @@author JavaScript skeleton ported by Peter Leonov.
  */
 
-var YYParser = (function(){ // start of the Parser very own namespase
-
-/**
-* A class defining a pair of positions.  Positions, defined by the
-* <code>Position</code> class, denote a point in the input.
-* Locations represent a part of the input through the beginning
-* and ending positions.  */
-function Location (begin, end) {
-  /** The first, inclusive, position in the range.  */
-  this.begin = begin;
-  this.end = end;
-}
-
-Location.prototype.toString = function () {
-  if (this.begin === this.end)
-    return "" + this.begin;
-
-  return this.begin + "-" + this.end;
-}
-
-
-function YYStack ()
-{
-  var stateStack = this.stateStack = [];
-  var locStack = this.locStack = [];
-  var valueStack = this.valueStack = [];
-
-  this.push = function push (state, value, location)
-  {
-    stateStack.push(state);
-    locStack.push(location);
-    valueStack.push(value);
-  }
-
-  this.pop = function pop (num)
-  {
-    if (num <= 0)
-      return;
-
-    valueStack.length -= num;
-    locStack.length -= num;
-    stateStack.length -= num; // TODO: original code lacks this line
-  }
-
-  this.stateAt = function stateAt (i)
-  {
-    return stateStack[stateStack.length-1 - i];
-  }
-
-  this.locationAt = function locationAt (i)
-  {
-    return locStack[locStack.length-1 - i];
-  }
-
-  this.valueAt = function valueAt (i)
-  {
-    return valueStack[valueStack.length-1 - i];
-  }
-
-  // used in debug mode or in an error recovery mode only
-  this.height = function height ()
-  {
-    return stateStack.length-1;
-  }
-
-  this.locationFromNthItemToCurrent = function locationFromNthItemToCurrent (n)
-  {
-    if (n > 0)
-      return new Location(this.locationAt(n-1).begin, this.locationAt(0).end);
-    
-    var end = this.locationAt(0).end
-    return new Location(end, end);
-  }
-}
 
 // Instantiates the Bison-generated parser.
-function YYParser (yylexer)
+// `lexer` is the scanner that will supply tokens to the parser.
+function YYParser (lexer)
 {
-  // self
-  var yyparser = this;
-  
-  // The scanner that will supply tokens to the parser.
-  this.yylexer = yylexer;
+// self
+var parser = this;
+
+// The three variables shared by Parser's guts and actions world
+// defined after the Parser very own namespace.
+// (`lexer` and `parser` are shared too),
+var yyval, yystack, yyvs, actionsTable;
+
+;(function(){ // start of the Parser very own namespase
 
   // True if verbose error messages are enabled.
   this.errorVerbose = true;
 
-  // Token returned by the scanner to signal the end of its input.
-  var EOF = 0;
-
+#if YYDEBUG
+  // enable/disable all the debug messages
+  parser.yydebug = 0;
+  // enable/disable printing the token values
+  parser.yydebug_yylval = true;
+  // enable/disable printing the whole action functions applied
+  parser.yydebug_action = false;
+  var debug_reduce_print = this.debug_reduce_print.bind(this);
+  var debug_symbol_print = this.debug_symbol_print.bind(this);
+  var debug_stack_print  = this.debug_stack_print.bind(this);
+  var debug_action       = this.debug_action.bind(this);
+  var debug_print        = this.debug_print.bind(this);
+#else // YYDEBUG
+#define debug_reduce_print(yyn)
+#define debug_symbol_print(message, yytype, yyvaluep)
+#define debug_stack_print(yystack)
+#define debug_action(yystack)
+#define debug_print(message)
+#endif // YYDEBUG
   
 
+  // Token returned by the scanner to signal the end of its input.
+  var EOF = 0;
 
   // Returned by a Bison action in order to stop the parsing process
   // and return success (<tt>true</tt>).
@@ -209,7 +155,7 @@ function YYParser (yylexer)
   var yyntokens_ = this.yyntokens_ = ]b4_tokens_number[;
   
   var yyerrstatus_ = 0;
-  function yyerrok () {yyerrstatus_ = 0;}
+  parser.yyerrok = function yyerrok () { yyerrstatus_ = 0; }
   
   // Return whether error recovery is being done.
   // In this state, the parser reads token until it reaches a known state,
@@ -217,52 +163,6 @@ function YYParser (yylexer)
   this.isRecovering = function isRecovering ()
   {
     return yyerrstatus_ == 0;
-  }
-
-  var yyval, yystack;
-  var actionsTable =
-  {
-    ]b4_list_of_actions[
-  }
-
-  function yyaction (yyn, yylen)
-  {
-    var yyloc = yystack.locationFromNthItemToCurrent(yylen);
-
-    /* If YYLEN is nonzero, implement the default value of the action:
-       `$$ = $1'.  Otherwise, use the top of the stack.
-
-       Otherwise, the following line sets YYVAL to garbage.
-       This behavior is undocumented and Bison
-       users should not rely upon it.  */
-    // var yyval; moved up in scope chain to share with actions
-    if (yylen > 0)
-      yyval = yystack.valueAt(yylen - 1);
-    else
-      yyval = yystack.valueAt(0);
-
-    debug_reduce_print(yyn);
-
-    var actionClosure = actionsTable[yyn]
-    if (actionClosure)
-      actionClosure(yystack)
-
-    debug_symbol_print("-> $$ =", yyr1_[yyn], yyval, yyloc); // TODO: step into
-
-    yystack.pop(yylen);
-    yylen = 0;
-    debug_stack_print(yystack);
-
-    // Shift the result of the reduction.
-    yyn = yyr1_[yyn];
-    var yystate = yypgoto_[yyn - yyntokens_] + yystack.stateAt(0);
-    if (0 <= yystate && yystate <= yylast_ && yycheck_[yystate] == yystack.stateAt(0))
-      yystate = yytable_[yystate];
-    else
-      yystate = yydefgoto_[yyn - yyntokens_];
-
-    yystack.push(yystate, yyval, yyloc);
-    // was: usless: return YYNEWSTATE;
   }
 
   /**
@@ -284,29 +184,24 @@ function YYParser (yylexer)
     var yystate = 0;
 
     // the only place yystack value is changed
-    yystack = this.yystack = new YYStack();
+    yystack = this.yystack = new YYParser.Stack();
+    yyvs = yystack.valueStack;
 
     /* Error handling.  */
     var yynerrs_ = 0;
-    // The location where the error started.
-    var yyerrloc = null;
-
-    // Location of the lookahead.
-    var yylloc = new Location(null, null);
-
-    // @@$.
-    var yyloc;
 
     // Semantic value of the lookahead.
-    var yylval = null;
+    var yylval = undefined;
 
     debug_print("Starting parse\n");
     yyerrstatus_ = 0;
 
 
     // Initialize the stack.
-    yystack.push(yystate, yylval, yylloc);
+    yystack.push(yystate, yylval);
 
+    // have tried: recursive closures, breaking blocks - switch is faster,
+    // next step: asm.js for the whole `parse()` function
     var label = YYNEWSTATE;
     goto_loop: for (;;)
     switch (label)
@@ -337,10 +232,8 @@ function YYParser (yylexer)
         if (yychar == yyempty_)
         {
           debug_print("Reading a token: ");
-          yychar = yylexer.yylex();
-
-          yylloc = new Location(yylexer.getStartPos(), yylexer.getEndPos());
-          yylval = yylexer.getLVal();
+          yychar = lexer.yylex();
+          yylval = lexer.yylval;
         }
 
 
@@ -357,7 +250,7 @@ function YYParser (yylexer)
           else
             yytoken = yyundef_token_;
 
-          debug_symbol_print("Next token is", yytoken, yylval, yylloc);
+          debug_symbol_print("Next token is", yytoken, yylval);
         }
 
         // If the proper action on seeing token YYTOKEN
@@ -391,7 +284,7 @@ function YYParser (yylexer)
         else
         {
           // Shift the lookahead token.
-          debug_symbol_print("Shifting", yytoken, yylval, yylloc);
+          debug_symbol_print("Shifting", yytoken, yylval);
 
           // Discard the token being shifted.
           yychar = yyempty_;
@@ -402,7 +295,7 @@ function YYParser (yylexer)
             --yyerrstatus_;
 
           yystate = yyn;
-          yystack.push(yystate, yylval, yylloc);
+          yystack.push(yystate, yylval);
 
           //goto
           label = YYNEWSTATE;
@@ -454,11 +347,9 @@ function YYParser (yylexer)
           ++yynerrs_;
           if (yychar == yyempty_)
             yytoken = yyempty_;
-          // this.yyerror(yylloc, this.yysyntax_error(yystate, yytoken));
-          yyerror(this.yysyntax_error(yystate, yytoken));
+          lexer.yyerror(this.yysyntax_error(yystate, yytoken));
         }
 
-        yyerrloc = yylloc;
         if (yyerrstatus_ == 3)
         {
           // If just tried and failed to reuse lookahead token
@@ -471,7 +362,10 @@ function YYParser (yylexer)
               return false;
           }
           else
+          {
+            // debug_symbol_print("Error: discarding", yystos_[yystate], yylval);
             yychar = yyempty_;
+          }
         }
 
         // Else will try to reuse lookahead token
@@ -486,7 +380,6 @@ function YYParser (yylexer)
       //-------------------------------------------------/
       case YYERROR:
 
-        yyerrloc = yystack.locationAt(yylen - 1);
         // Do not reclaim the symbols of the rule
         // which action triggered this YYERROR.
         yystack.pop(yylen);
@@ -520,27 +413,22 @@ function YYParser (yylexer)
           // Pop the current state because it cannot handle the error token.
           if (yystack.height() == 0)
           {
-            return false;
+            label = YYABORT;
+            continue goto_loop;
           }
 
-          yyerrloc = yystack.locationAt(0);
+          debug_symbol_print("Error: popping", yystos_[yystate], yylval);
           yystack.pop(1);
           yystate = yystack.stateAt(0);
           debug_stack_print(yystack);
         }
 
 
-        // Muck with the stack to setup for yylloc.
-        yystack.push(0, null, yylloc);
-        yystack.push(0, null, yyerrloc);
-        yyloc = yystack.locationFromNthItemToCurrent(2);
-        yystack.pop(2);
-
         // Shift the error token.
-        debug_symbol_print("Shifting", yystos_[yyn], yylval, yyloc);
+        debug_symbol_print("Shifting", yystos_[yyn], yylval);
 
         yystate = yyn;
-        yystack.push(yyn, yylval, yyloc);
+        yystack.push(yyn, yylval);
         // goto
         label = YYNEWSTATE;
         continue goto_loop;
@@ -555,6 +443,10 @@ function YYParser (yylexer)
       // Abort.               |
       //---------------------/
       case YYABORT:
+        // debug_symbol_print("Error: popping", yystos_[yyn], yylval);
+        // yystack.pop(1);
+        // yystate = yystack.stateAt(0);
+        // debug_stack_print(yystack);
         return false;
 
       default:
@@ -566,21 +458,49 @@ function YYParser (yylexer)
     return false
   }
 
-
-  // enabling debug will switch these functions to the usefull variants
-  function debug_reduce_print (yyn) {}
-  function debug_symbol_print (message, yytype, yyvaluep, yylocationp) {}
-  function debug_stack_print (yystack) {}
-  function debug_print (message) {}
-
-  this.enableDebug = function enableDebug ()
+  function yyaction (yyn, yylen)
   {
-    debug_reduce_print = this.debug_reduce_print.bind(this)
-    debug_symbol_print = this.debug_symbol_print.bind(this)
-    debug_stack_print  = this.debug_stack_print.bind(this)
-    debug_print        = this.debug_print.bind(this)
-  }
+    /* If YYLEN is nonzero, implement the default value of the action:
+       `$$ = $1'.  Otherwise, use the top of the stack.
 
+       Otherwise, the following line sets YYVAL to garbage.
+       This behavior is undocumented and Bison
+       users should not rely upon it.  */
+    // var yyval; moved up in scope chain to share with actions
+    // if (yylen > 0)
+    //   yyval = yystack.valueAt(yylen - 1);
+    // else
+    //   yyval = yystack.valueAt(0);
+    
+    if (yylen > 0)
+      yyval = yystack.valueAt(yylen - 1);
+    else
+      yyval = undefined; // yes, setting garbage value
+
+    debug_reduce_print(yyn);
+
+    var actionClosure = actionsTable[yyn]
+    debug_action(actionClosure);
+    if (actionClosure)
+      actionClosure();
+
+    debug_symbol_print("-> $$ =", yyr1_[yyn], yyval);
+
+    yystack.pop(yylen);
+    yylen = 0;
+    debug_stack_print(yystack);
+
+    // Shift the result of the reduction.
+    yyn = yyr1_[yyn];
+    var yystate = yypgoto_[yyn - yyntokens_] + yystack.stateAt(0);
+    if (0 <= yystate && yystate <= yylast_ && yycheck_[yystate] == yystack.stateAt(0))
+      yystate = yytable_[yystate];
+    else
+      yystate = yydefgoto_[yyn - yyntokens_];
+
+    yystack.push(yystate, yyval);
+    // was: usless: return YYNEWSTATE;
+  }
 
   // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing STATE-NUM.
   var yypact_ninf_ = this.yypact_ninf_ = ]b4_pact_ninf[;
@@ -695,16 +615,15 @@ function YYParser (yylexer)
     b4_prhs
     //[[
   ];
-
+#if YYDEBUG
   // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-  // TODO: hide this table under #if DEBUG
   var yyrline_ = this.yyrline_ =
   [
     //]]
     b4_rline
     //[[
   ];
-
+#endif // YYDEBUG
   // YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.
   var yytranslate_table_ =
   [
@@ -722,50 +641,154 @@ function YYParser (yylexer)
 
   var yyuser_token_number_max_ = ]b4_user_token_number_max[;
   var yyundef_token_ = ]b4_undef_token_number[;
-}
+
+}).call(this); // end of the Parser very own namespase
+
+;(function(){ // actions table namespace start
+
+]b4_percent_code_get([[actions]])[
+
+actionsTable =
+{
+  ]b4_list_of_actions[
+};
+
+})(); // actions table namespace end
+
+
+} // YYParser
 
 // rare used functions
 YYParser.prototype =
 {
-  // yyerror: function yyerror (location, message)
-  // {
-  //   this.yylexer.yyerror(location, message);
-  // },
-  
   // Report on the debug stream that the rule yyrule is going to be reduced.
+#if YYDEBUG
+  yyinspect: function (obj)
+  {
+    return (obj && obj.yyinspect) ? obj.yyinspect() : JSON.stringify(obj);
+  },
+
   debug_reduce_print: function debug_reduce_print (yyrule)
   {
-    var yystack = this.yystack;
-    var yylno = this.yyrline_[yyrule];
-    var yynrhs = this.yyr2_[yyrule];
-    // Print the symbols being reduced, and their result.
-    this.debug_print("Reducing stack by rule " + (yyrule - 1) + " (line " + yylno + "), \n");
-
-    // The symbols being reduced.
-    for (var yyi = 0; yyi < yynrhs; yyi++)
+    if (this.yydebug >= 2)
     {
-      this.debug_symbol_print(
-        "   $" + (yyi + 1) + " =",
-        this.yyrhs_[this.yyprhs_[yyrule] + yyi],
-        ]b4_rhs_value(yynrhs, yyi + 1)[,
-        ]b4_rhs_location(yynrhs, yyi + 1)[
+      var yystack = this.yystack;
+      var yylno = this.yyrline_[yyrule];
+      var yynrhs = this.yyr2_[yyrule];
+      // Print the symbols being reduced, and their result.
+      this.print("Reducing stack by rule " + (yyrule - 1) + " (line " + yylno + "):\n");
+
+      // The symbols being reduced.
+      for (var yyi = 0; yyi < yynrhs; yyi++)
+      {
+        this.debug_symbol_print(
+          "   $" + (yyi + 1) + " =",
+          this.yyrhs_[this.yyprhs_[yyrule] + yyi],
+          ]b4_rhs_value_debug(yynrhs, yyi + 1)[
+        );
+      }
+    }
+    else if (this.yydebug >= 1)
+    {
+      var yystack = this.yystack;
+      var yylno = this.yyrline_[yyrule];
+      var yynrhs = this.yyr2_[yyrule];
+      // Print the symbols being reduced, and their result.
+      yylno = ''+yylno;
+      
+      var pad = '..................................';
+      write(yylno + ' ' + pad.substr(yylno.length) + ' : ');
+      
+      // The symbols being reduced.
+      for (var yyi = 0; yyi < yynrhs; yyi++)
+      {
+        var name = this.yytname_[[this.yyrhs_[this.yyprhs_[yyrule] + yyi]]];
+        write(name + " ");
+      }
+      write("\n");
+      
+      if (this.yydebug_yylval)
+      {
+        // The symbols being reduced.
+        for (var yyi = 0; yyi < yynrhs; yyi++)
+        {
+          var name = this.yytname_[[this.yyrhs_[this.yyprhs_[yyrule] + yyi]]];
+          var value = ]b4_rhs_value_debug(yynrhs, yyi + 1)[;
+          this.print("$" + (yyi + 1) + " " + name + " = "+ this.yyinspect(value) + "\n");
+        }
+      }
+    }
+    // debug <= 0
+  },
+
+  debug_symbol_print: function debug_symbol_print (message, yytype, yyvaluep)
+  {
+    if (this.yydebug >= 2)
+    {
+      this.print
+      (
+        message
+        + (yytype < this.yyntokens_ ? " token " : " nterm ")
+        + this.yytname_[yytype]
+        + " ("
+        + (this.yydebug_yylval ? this.yyinspect(yyvaluep) : '')
+        + ")\n"
       );
     }
+    else if (this.yydebug >= 1)
+    {
+      this.print
+      (
+        "$$ "
+        + this.yytname_[yytype]
+        + " = "
+        + (this.yydebug_yylval ? this.yyinspect(yyvaluep) : '')
+        + "\n"
+      );
+      this.print("\n");
+    }
+    // yydebug <= 0
   },
 
-  debug_symbol_print: function debug_symbol_print (message, yytype, yyvaluep, yylocationp)
+  debug_stack_print: function debug_stack_print ()
   {
-    this.debug_print
-    (
-      message
-      + (yytype < this.yyntokens_ ? " token " : " nterm ")
-      + this.yytname_[yytype]
-      + " ("
-      + yylocationp + ": "
-      + (yyvaluep == null ? "(null)" : yyvaluep)
-      + ")\n"
-    );
+    if (this.yydebug < 2)
+      return;
+
+    puts("Stack now " + this.yystack.stateStack.join(' '));
   },
+
+  debug_action: function debug_action (action)
+  {
+    if (!this.yydebug_action)
+      return;
+    
+    if (this.yydebug >= 2)
+    {
+      puts(action);
+    }
+    else if (this.yydebug >= 1)
+    {
+      if (/^function\s*\([^)]*\)\s*{\s*}$/.test(actionClosure))
+      {
+        throw 'empty action';
+      }
+    }
+    // yydebug <= 0
+  },
+
+  debug_print: function debug_print (message)
+  {
+    if (this.yydebug < 2)
+      return;
+
+    write(message);
+  },
+  print: function print (message)
+  {
+    write(message);
+  },
+#endif // YYDEBUG
 
   // Generate an error message.
   yysyntax_error: function yysyntax_error (yystate, tok)
@@ -894,23 +917,6 @@ YYParser.prototype =
 
       return yystr;
     }
-  },
-
-  debug_stack_print: function debug_stack_print ()
-  {
-    var yystack = this.yystack,
-      ary = [];
-    for (var i = 0, ih = yystack.height(); i <= ih; i++)
-    {
-      ary.push(yystack.stateAt(i));
-    }
-    
-    puts("Stack now " + ary.reverse().join(' '));
-  },
-
-  debug_print: function debug_print (message)
-  {
-    write(message);
   }
 }
 
@@ -920,16 +926,46 @@ YYParser.bisonVersion = "]b4_version[";
 // Name of the skeleton that generated this parser.
 YYParser.bisonSkeleton = ]b4_skeleton[;
 
-return YYParser;
+YYParser.Stack = function Stack ()
+{
+  var stateStack = this.stateStack = [];
+  var valueStack = this.valueStack = [];
 
-})(); // end of the Parser very own namespase
+  this.push = function push (state, value)
+  {
+    stateStack.push(state);
+    valueStack.push(value);
+  }
 
-;(function(){ // epilogue namespace
+  this.pop = function pop (num)
+  {
+    if (num <= 0)
+      return;
 
+    valueStack.length -= num;
+    stateStack.length -= num; // TODO: original code lacks this line
+  }
+
+  this.stateAt = function stateAt (i)
+  {
+    return stateStack[stateStack.length-1 - i];
+  }
+
+  this.valueAt = function valueAt (i)
+  {
+    return valueStack[valueStack.length-1 - i];
+  }
+
+  // used in debug mode or in an error recovery mode only
+  this.height = function height ()
+  {
+    return stateStack.length-1;
+  }
+}
+
+
+// here goes the epilogue
 ]b4_epilogue[
 
-})(); // end of epilogue namespace
-
-}).call(this); // start of the whole parser+lexer namespase
 ]
 b4_output_end()
