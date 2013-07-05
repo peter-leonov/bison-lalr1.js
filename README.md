@@ -96,6 +96,8 @@ which is good too :)
 
 The `calcolator.y` example has a built-in lexer emulator with a simple token stream for the `((3+2*3)*1)/-3` expression. In [ruby-parser.js](https://github.com/kung-fu-tzu/ruby-parser.js) project you can find a full featured parser build with `lalr1.js`.
 
+Thanks to [jison](https://github.com/zaach/jison) project for the example and the inspiration!
+
 Features
 ========
 
