@@ -87,25 +87,6 @@ var yyval, yystack, yyvs, actionsTable;
   // True if verbose error messages are enabled.
   this.errorVerbose = true;
 
-
-  // enable/disable all the debug messages
-  parser.yydebug = 0;
-  // enable/disable printing the token values
-  parser.yydebug_yylval = true;
-  // enable/disable printing the whole action functions applied
-  parser.yydebug_action = false;
-  var debug_reduce_print = this.debug_reduce_print.bind(this);
-  var debug_symbol_print = this.debug_symbol_print.bind(this);
-  var debug_stack_print  = this.debug_stack_print.bind(this);
-  var debug_action       = this.debug_action.bind(this);
-  var debug_print        = this.debug_print.bind(this);
-
-
-
-
-
-
-
   
 
   // Token returned by the scanner to signal the end of its input.
@@ -173,7 +154,7 @@ var yyval, yystack, yyvs, actionsTable;
     // Semantic value of the lookahead.
     var yylval = undefined;
 
-    debug_print("Starting parse\n");
+    ;
     yyerrstatus_ = 0;
 
 
@@ -192,7 +173,7 @@ var yyval, yystack, yyvs, actionsTable;
       case YYNEWSTATE:
         // Unlike in the C/C++ skeletons, the state is already pushed when we come here.
 
-        debug_print("Entering state " + yystate + "\n");
+        ;
 
         // Accept?
         if (yystate == yyfinal_)
@@ -211,7 +192,7 @@ var yyval, yystack, yyvs, actionsTable;
         // Read a lookahead token.
         if (yychar == yyempty_)
         {
-          debug_print("Reading a token: ");
+          ;
           yychar = lexer.yylex();
           yylval = lexer.yylval;
         }
@@ -221,7 +202,7 @@ var yyval, yystack, yyvs, actionsTable;
         if (yychar <= EOF)
         {
           yychar = yytoken = EOF;
-          debug_print("Now at end of input.\n");
+          ;
         }
         else
         {
@@ -230,7 +211,7 @@ var yyval, yystack, yyvs, actionsTable;
           else
             yytoken = yyundef_token_;
 
-          debug_symbol_print("Next token is", yytoken, yylval);
+          ;
         }
 
         // If the proper action on seeing token YYTOKEN
@@ -264,7 +245,7 @@ var yyval, yystack, yyvs, actionsTable;
         else
         {
           // Shift the lookahead token.
-          debug_symbol_print("Shifting", yytoken, yylval);
+          ;
 
           // Discard the token being shifted.
           yychar = yyempty_;
@@ -343,7 +324,7 @@ var yyval, yystack, yyvs, actionsTable;
           }
           else
           {
-            // debug_symbol_print("Error: discarding", yystos_[yystate], yylval);
+            // ;
             yychar = yyempty_;
           }
         }
@@ -364,7 +345,7 @@ var yyval, yystack, yyvs, actionsTable;
         // which action triggered this YYERROR.
         yystack.pop(yylen);
         yylen = 0;
-        debug_stack_print(yystack);
+        ;
         yystate = yystack.stateAt(0);
         // goto
         label = YYERRLAB1;
@@ -397,15 +378,15 @@ var yyval, yystack, yyvs, actionsTable;
             continue goto_loop;
           }
 
-          debug_symbol_print("Error: popping", yystos_[yystate], yylval);
+          ;
           yystack.pop(1);
           yystate = yystack.stateAt(0);
-          debug_stack_print(yystack);
+          ;
         }
 
 
         // Shift the error token.
-        debug_symbol_print("Shifting", yystos_[yyn], yylval);
+        ;
 
         yystate = yyn;
         yystack.push(yyn, yylval);
@@ -423,10 +404,10 @@ var yyval, yystack, yyvs, actionsTable;
       // Abort.               |
       //---------------------/
       case YYABORT:
-        // debug_symbol_print("Error: popping", yystos_[yyn], yylval);
+        // ;
         // yystack.pop(1);
         // yystate = yystack.stateAt(0);
-        // debug_stack_print(yystack);
+        // ;
         return false;
 
       default:
@@ -457,18 +438,18 @@ var yyval, yystack, yyvs, actionsTable;
     else
       yyval = undefined; // yes, setting garbage value
 
-    debug_reduce_print(yyn);
+    ;
 
     var actionClosure = actionsTable[yyn]
-    debug_action(actionClosure);
+    ;
     if (actionClosure)
       actionClosure();
 
-    debug_symbol_print("-> $$ =", yyr1_[yyn], yyval);
+    ;
 
     yystack.pop(yylen);
     yylen = 0;
-    debug_stack_print(yystack);
+    ;
 
     // Shift the result of the reduction.
     yyn = yyr1_[yyn];
@@ -616,16 +597,6 @@ var yyval, yystack, yyvs, actionsTable;
       33,    35,    37
     //[
   ];
-
-  // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-  var yyrline_ = this.yyrline_ =
-  [
-    //]
-         0,    26,    26,    31,    33,    35,    37,    39,    41,    43,
-      45,    47,    49
-    //[
-  ];
-
   // YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.
   var yytranslate_table_ =
   [
@@ -722,133 +693,6 @@ actionsTable =
 YYParser.prototype =
 {
   // Report on the debug stream that the rule yyrule is going to be reduced.
-
-  yyinspect: function (obj)
-  {
-    return (obj && obj.yyinspect) ? obj.yyinspect() : JSON.stringify(obj);
-  },
-
-  debug_reduce_print: function debug_reduce_print (yyrule)
-  {
-    if (this.yydebug >= 2)
-    {
-      var yystack = this.yystack;
-      var yylno = this.yyrline_[yyrule];
-      var yynrhs = this.yyr2_[yyrule];
-      // Print the symbols being reduced, and their result.
-      this.print("Reducing stack by rule " + (yyrule - 1) + " (line " + yylno + "):\n");
-
-      // The symbols being reduced.
-      for (var yyi = 0; yyi < yynrhs; yyi++)
-      {
-        this.debug_symbol_print(
-          "   $" + (yyi + 1) + " =",
-          this.yyrhs_[this.yyprhs_[yyrule] + yyi],
-          yystack.valueStack[yystack.valueStack.length-1-((yynrhs-(yyi + 1)))]
-        );
-      }
-    }
-    else if (this.yydebug >= 1)
-    {
-      var yystack = this.yystack;
-      var yylno = this.yyrline_[yyrule];
-      var yynrhs = this.yyr2_[yyrule];
-      // Print the symbols being reduced, and their result.
-      yylno = ''+yylno;
-      
-      var pad = '..................................';
-      write(yylno + ' ' + pad.substr(yylno.length) + ' : ');
-      
-      // The symbols being reduced.
-      for (var yyi = 0; yyi < yynrhs; yyi++)
-      {
-        var name = this.yytname_[[this.yyrhs_[this.yyprhs_[yyrule] + yyi]]];
-        write(name + " ");
-      }
-      write("\n");
-      
-      if (this.yydebug_yylval)
-      {
-        // The symbols being reduced.
-        for (var yyi = 0; yyi < yynrhs; yyi++)
-        {
-          var name = this.yytname_[[this.yyrhs_[this.yyprhs_[yyrule] + yyi]]];
-          var value = yystack.valueStack[yystack.valueStack.length-1-((yynrhs-(yyi + 1)))];
-          this.print("$" + (yyi + 1) + " " + name + " = "+ this.yyinspect(value) + "\n");
-        }
-      }
-    }
-    // debug <= 0
-  },
-
-  debug_symbol_print: function debug_symbol_print (message, yytype, yyvaluep)
-  {
-    if (this.yydebug >= 2)
-    {
-      this.print
-      (
-        message
-        + (yytype < this.yyntokens_ ? " token " : " nterm ")
-        + this.yytname_[yytype]
-        + " ("
-        + (this.yydebug_yylval ? this.yyinspect(yyvaluep) : '')
-        + ")\n"
-      );
-    }
-    else if (this.yydebug >= 1)
-    {
-      this.print
-      (
-        "$$ "
-        + this.yytname_[yytype]
-        + " = "
-        + (this.yydebug_yylval ? this.yyinspect(yyvaluep) : '')
-        + "\n"
-      );
-      this.print("\n");
-    }
-    // yydebug <= 0
-  },
-
-  debug_stack_print: function debug_stack_print ()
-  {
-    if (this.yydebug < 2)
-      return;
-
-    puts("Stack now " + this.yystack.stateStack.join(' '));
-  },
-
-  debug_action: function debug_action (action)
-  {
-    if (!this.yydebug_action)
-      return;
-    
-    if (this.yydebug >= 2)
-    {
-      puts(action);
-    }
-    else if (this.yydebug >= 1)
-    {
-      if (/^function\s*\([^)]*\)\s*{\s*}$/.test(actionClosure))
-      {
-        throw 'empty action';
-      }
-    }
-    // yydebug <= 0
-  },
-
-  debug_print: function debug_print (message)
-  {
-    if (this.yydebug < 2)
-      return;
-
-    write(message);
-  },
-  print: function print (message)
-  {
-    write(message);
-  },
-
 
   // Generate an error message.
   yysyntax_error: function yysyntax_error (yystate, tok)
@@ -1073,30 +917,31 @@ var
   tL = 40, // '('.charCodeAt(0)
   tR = 41; // ')'.charCodeAt(0)
 
-// ((3+2*3)*1)/-3
+// (-(2+2*2)/1)*-7
 var lexer = new Lexer
 ([
   [tL, '('],
+  [tMINUS, '-'],
   [tL, '('],
-  [tNUMBER, '3'],
+  [tNUMBER, '2'],
   [tPLUS, '+'],
   [tNUMBER, '2'],
   [tMULT, '*'],
-  [tNUMBER, '3'],
-  [tR, ')'],
-  [tMULT, '*'],
-  [tNUMBER, '1'],
+  [tNUMBER, '2'],
   [tR, ')'],
   [tDIV, '/'],
+  [tNUMBER, '1'],
+  [tR, ')'],
+  [tMULT, '*'],
   [tMINUS, '-'],
-  [tNUMBER, '3'],
+  [tNUMBER, '7'],
   [tEND, '']
 ])
 
-var parser = new YYParser(lexer)
+var parser = new YYParser(lexer);
 parser.yydebug = 2;
-print(parser.parse())
-print(result == -3)
+print(parser.parse() ? 'Parsed OK.' : 'Parsed with errors.')
+print('Answer is ' + result);
 
 
 

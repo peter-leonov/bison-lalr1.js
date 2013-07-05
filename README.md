@@ -117,5 +117,5 @@ Features
 
 The main and only feature is that this skeleton does its job exactly the same way the original C and Java skeletons do.
 
-In debug mode (`cpp -DDEBUG …`) the resulting parser produces exactly the same debug output (excepting memory management entries), state transitions and even states and token numbers as the `yacc.c` skeleton does. This gives a handy way of testing your ported parser just by comparing the original and ported parsers output with `diff`. In ruby parser project both parsers produce bit-to-bit equal output on complex ruby source of 48,000 lines.
+In debug mode (`cpp -DYYDEBUG …`) the resulting parser produces exactly the same debug output (excepting memory management entries), state transitions and even states and token numbers as the `yacc.c` skeleton does. This gives a handy way of testing your ported parser just by comparing the original and ported parsers output with `diff`. In ruby parser project both parsers produce bit-to-bit equal output on complex ruby source of 48,000 lines.
 
