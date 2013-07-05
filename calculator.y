@@ -96,27 +96,28 @@ var
   tL = 40, // '('.charCodeAt(0)
   tR = 41; // ')'.charCodeAt(0)
 
-// ((3+2*3)*1)/-3
+// (-(2+2*2)/1)*-7
 var lexer = new Lexer
 ([
   [tL, '('],
+  [tMINUS, '-'],
   [tL, '('],
-  [tNUMBER, '3'],
+  [tNUMBER, '2'],
   [tPLUS, '+'],
   [tNUMBER, '2'],
   [tMULT, '*'],
-  [tNUMBER, '3'],
-  [tR, ')'],
-  [tMULT, '*'],
-  [tNUMBER, '1'],
+  [tNUMBER, '2'],
   [tR, ')'],
   [tDIV, '/'],
+  [tNUMBER, '1'],
+  [tR, ')'],
+  [tMULT, '*'],
   [tMINUS, '-'],
-  [tNUMBER, '3'],
+  [tNUMBER, '7'],
   [tEND, '']
 ])
 
-var parser = new YYParser(lexer)
+var parser = new YYParser(lexer);
 parser.yydebug = 2;
-print(parser.parse())
-print(result == -3)
+print(parser.parse() ? 'Parsed OK.' : 'Parsed with errors.')
+print('Answer is ' + result);

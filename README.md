@@ -1,3 +1,17 @@
+Example first
+=============
+
+Open `calculator.js` in editor, see the bison parser beauty, then run:
+
+    v8 calculator.js
+
+it calculates the result of the expression `(-(2+2*2)/1)*-7` and outputs:
+
+    Parsed OK.
+    Answer is 42
+
+Source of `calculator.js` is in `calculator.y` (lexer is at the bottom).
+
 lalr1.js
 ========
 
@@ -62,8 +76,8 @@ then:
 
 outputs:
 
-    true
-    true
+    Parsed OK.
+    Answer is 42
 
 which is good :)
 
@@ -81,16 +95,16 @@ If you want to trace all the state transitions run `make calculator-debug` in th
     
     Entering state 11
     Reducing stack by rule 1 (line 26):
-       $1 = nterm e (-3)
+       $1 = nterm e (-7)
        $2 = token tEND ("")
-    -> $$ = nterm expressions (-3)
+    -> $$ = nterm expressions (-7)
     Stack now 0
     Entering state 6
     Reading a token: Now at end of input.
     Shifting token $end ("")
     Entering state 10
-    true
-    true
+    Parsed OK.
+    Answer is 42
 
 which is good too :)
 
