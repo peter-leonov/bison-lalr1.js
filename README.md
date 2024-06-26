@@ -1,4 +1,15 @@
-# Example first
+# lalr1.js
+
+JavaScript skeleton for Bison GNU Parser Generator.
+
+Allows easily port any grammars from other languages to JavaScript. As it is just a Bison with a different target platform, lalr1.js supports all the features of BNF syntax and Bison specific extensions. Also, Bison generates efficient tables which do fit v8 and js17 very tight. So expect good performance!
+
+Please look at the produced code in [calculator.js](calculator.js)
+
+P.S.
+If someone could port flex to JavaScript, there will be a full professional stack for creating parsers in pure JavaScript.
+
+## Example
 
 Open `calculator.js` in editor, see the bison parser beauty, then run:
 
@@ -11,18 +22,7 @@ it calculates the result of the expression `(-(2+2*2)/1)*-7` and outputs:
 
 Source of `calculator.js` is in `calculator.y` (lexer is at the bottom).
 
-# lalr1.js
-
-JavaScript skeleton for Bison GNU Parser Generator.
-
-Allows easily port any grammars from other languages to JavaScript. As it is just a Bison with a different target platform, lalr1.js supports all the features of BNF syntax and Bison specific extensions. Also, Bison generates efficient tables which do fit v8 and js17 very tight. So expect good performance!
-
-Please look at the produced code in [calculator.js](calculator.js)
-
-P.S.
-If someone could port flex to JavaScript, there will be a full professional stack for creating parsers in pure JavaScript.
-
-# Prerequisites
+## Prerequisites
 
 `bison` (version 2.7+), `make`, and `cpp` (The C Preprocessor, not the C++ compiler).
 
@@ -62,7 +62,7 @@ On my system their versions look like this:
 
 Almost every thing came from GNU. Kudos!
 
-# Test
+## Test
 
     make calculator
 
@@ -108,7 +108,7 @@ The `calcolator.y` example has a built-in lexer emulator with a simple token str
 
 Thanks to [jison](https://github.com/zaach/jison) project for the example and the inspiration!
 
-# Features
+## Features
 
 The main and only feature is that this skeleton does its job exactly the same way the original C and Java skeletons do.
 
