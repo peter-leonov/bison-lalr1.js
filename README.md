@@ -1,13 +1,12 @@
 # lalr1.js
 
-JavaScript skeleton for Bison GNU Parser Generator.
+A JavaScript skeleton for Bison GNU Parser Generator.
 
-Allows easily port any grammars from other languages to JavaScript. As it is just a Bison with a different target platform, lalr1.js supports all the features of BNF syntax and Bison specific extensions. Also, Bison generates efficient tables which do fit v8 and js17 very tight. So expect good performance!
+Allows to easily port any Bison grammars from other languages to JavaScript. As it is just Bison with a different target platform, `lalr1.js` supports all the features of the BNF syntax and also Bison specific extensions. The state transitions during parsing are gonna be exactly the same (given the same feedback from the lexer for non-trivial grammars) which makes debugging a breeze: if something worked, say, in C it's gonna work in JS too, just keep folowing the same lexer integration. Also, Bison generates efficient tables which do fit v8 and js17 engines nicely, thus expect good performance!
 
-Please look at the produced code in [calculator.js](calculator.js)
+Take a look at an example produced code in [calculator.js](calculator.js).
 
-P.S.
-If someone could port flex to JavaScript, there will be a full professional stack for creating parsers in pure JavaScript.
+P.S. If someone ports Flex to JavaScript, there will be a full professional stack for creating parsers in pure JavaScript.
 
 ## Example
 
