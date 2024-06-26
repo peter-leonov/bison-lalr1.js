@@ -37,12 +37,6 @@
 /* Line 1 of "calculator.y"  */
 
 
-if (typeof write == "undefined")
-{
-  write = print;
-}
-puts = print;
-
 var result
 
 
@@ -906,8 +900,6 @@ return Lexer
 
 })();
 
-this.console = {log: print}
-
 var
   tPLUS = 43, // '+'.charCodeAt(0)
   tMINUS = 45, // '-'.charCodeAt(0)
@@ -940,8 +932,8 @@ var lexer = new Lexer
 
 var parser = new YYParser(lexer);
 parser.yydebug = 2;
-print(parser.parse() ? 'Parsed OK.' : 'Parsed with errors.')
-print('Answer is ' + result);
+console.log(parser.parse() ? 'Parsed OK.' : 'Parsed with errors.')
+console.log('Answer is ' + result);
 
 
 

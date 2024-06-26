@@ -2,7 +2,7 @@
 
 A JavaScript skeleton for Bison GNU Parser Generator.
 
-Allows to easily port any Bison grammars from other languages to JavaScript. As it is just Bison with a different target platform, `lalr1.js` supports all the features of the BNF syntax and also Bison specific extensions. The state transitions during parsing are gonna be exactly the same (given the same feedback from the lexer for non-trivial grammars) which makes debugging a breeze: if something worked, say, in C it's gonna work in JS too, just keep folowing the same lexer integration. Also, Bison generates efficient tables which do fit v8 and js17 engines nicely, thus expect good performance!
+Allows to easily port any Bison grammars from other languages to JavaScript. As it is just Bison with a different target platform, `lalr1.js` supports all the features of the BNF syntax and also Bison specific extensions. The state transitions during parsing are gonna be exactly the same (given the same feedback from the lexer for non-trivial grammars) which makes debugging a breeze: if something worked, say, in C it's gonna work in JS too, just keep folowing the same lexer integration. Also, Bison generates efficient tables which do fit modern JS engines nicely, thus expect good performance!
 
 Take a look at an example produced code in [calculator.js](calculator.js).
 
@@ -12,7 +12,7 @@ P.S. If someone ports Flex to JavaScript, there will be a full professional stac
 
 Open `calculator.js` in editor, see the bison parser beauty, then run:
 
-    v8 calculator.js
+    node calculator.js
 
 it calculates the result of the expression `(-(2+2*2)/1)*-7` and outputs:
 
@@ -67,7 +67,7 @@ Almost every thing came from GNU. Kudos!
 
 then:
 
-    d8 calculator.js
+    node calculator.js
 
 outputs:
 
@@ -76,9 +76,7 @@ outputs:
 
 which is good :)
 
-If your sustem doesn't build `d8` you may replace it with just `v8`, but it gives sligtly different output.
-
-If you want to trace all the state transitions run `make calculator-debug` in the first step. Then run `d8 calculator.js` to see something like this:
+If you want to trace all the state transitions run `make calculator-debug` in the first step. Then run `node calculator.js` to see something like this:
 
     Starting parse
     Entering state 0
