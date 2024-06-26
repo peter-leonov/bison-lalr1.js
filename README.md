@@ -1,5 +1,4 @@
-Example first
-=============
+# Example first
 
 Open `calculator.js` in editor, see the bison parser beauty, then run:
 
@@ -12,8 +11,7 @@ it calculates the result of the expression `(-(2+2*2)/1)*-7` and outputs:
 
 Source of `calculator.js` is in `calculator.y` (lexer is at the bottom).
 
-lalr1.js
-========
+# lalr1.js
 
 JavaScript skeleton for Bison GNU Parser Generator.
 
@@ -24,8 +22,7 @@ Please look at the produced code in [calculator.js](calculator.js)
 P.S.
 If someone could port flex to JavaScript, there will be a full professional stack for creating parsers in pure JavaScript.
 
-Prerequisites
-=============
+# Prerequisites
 
 `bison` (version 2.7+), `make`, and `cpp` (The C Preprocessor, not the C++ compiler).
 
@@ -65,8 +62,7 @@ On my system their versions look like this:
 
 Almost every thing came from GNU. Kudos!
 
-Test
-====
+# Test
 
     make calculator
 
@@ -90,9 +86,9 @@ If you want to trace all the state transitions run `make calculator-debug` in th
     Reading a token: Next token is token '(' ("(")
     Shifting token '(' ("(")
     Entering state 5
-    
+
     …
-    
+
     Entering state 11
     Reducing stack by rule 1 (line 26):
        $1 = nterm e (-7)
@@ -112,10 +108,8 @@ The `calcolator.y` example has a built-in lexer emulator with a simple token str
 
 Thanks to [jison](https://github.com/zaach/jison) project for the example and the inspiration!
 
-Features
-========
+# Features
 
 The main and only feature is that this skeleton does its job exactly the same way the original C and Java skeletons do.
 
 In debug mode (`cpp -DYYDEBUG …`) the resulting parser produces exactly the same debug output (excepting memory management entries), state transitions and even states and token numbers as the `yacc.c` skeleton does. This gives a handy way of testing your ported parser just by comparing the original and ported parsers output with `diff`. In ruby parser project both parsers produce bit-to-bit equal output on complex ruby source of 48,000 lines.
-
